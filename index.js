@@ -21,9 +21,9 @@ dotenv.config();
 
 // Create PayPal client
 const environment = () => {
-  const clientId = process.env.PAYPAL_CLIENT_ID;
-  const clientSecret = process.env.PAYPAL_CLIENT_SECRET;
-  return new checkoutNodeJssdk.core.SandboxEnvironment(clientId, clientSecret);
+    const clientId = process.env.PAYPAL_CLIENT_ID;
+    const clientSecret = process.env.PAYPAL_CLIENT_SECRET;
+    return new checkoutNodeJssdk.core.SandboxEnvironment(clientId, clientSecret);
 };
 
 const client = () => new checkoutNodeJssdk.core.PayPalHttpClient(environment());
@@ -32,9 +32,16 @@ const client = () => new checkoutNodeJssdk.core.PayPalHttpClient(environment());
 const app = express();
 const port = process.env.PORT || 3000;
 
+
+
 // Middleware
 app.use(cookieParser());
-app.use(cors());
+
+const corsOptions = {
+    origin: 'https://heatwavehotwiches.com',
+    optionsSuccessStatus: 200
+};
+app.use(cors(corsOptions));
 app.use(express.json({ limit: '50mb' }));
 app.use(express.urlencoded({ limit: '50mb', extended: true }));
 app.use('/public', express.static('public'));
@@ -49,7 +56,7 @@ app.use("/delivery", deliveriesRoutes);
 app.use("/user", userRoutes);
 
 // Create payment endpoint for PayPal
-app.post('/createpayment', async (req, res) => {
+app.post('/createpayment', async(req, res) => {
     const { amount, method } = req.body;
     try {
         if (method === 'paypal') {
@@ -77,7 +84,7 @@ app.post('/createpayment', async (req, res) => {
 });
 
 // Create endpoint to capture payment
-app.post('/capturepayment', async (req, res) => {
+app.post('/capturepayment', async(req, res) => {
     const { orderId } = req.body;
     try {
         const request = new checkoutNodeJssdk.orders.OrdersCaptureRequest(orderId);
